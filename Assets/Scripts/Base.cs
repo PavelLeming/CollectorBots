@@ -1,55 +1,69 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Base : MonoBehaviour
 {
-    [SerializeField] private LayerMask ResourceMask;
-    [SerializeField] private List<Worker> _workers; 
+    [SerializeField] private List<Worker> _workers;
+    [SerializeField] private Scaner _scaner;
 
-    private Vector3 _boxParametrs = new Vector3(9f, 0, 9f);
-    private float _scanTimer = 0.5f;
+    public event Action NewResource;
 
-    private void Start()
+    private int _resourcesCount = 0;
+    private List<Resource> _resources = new List<Resource>();
+    private List<Resource> _resourcesInProgress = new List<Resource>();
+
+    public int Resources => _resourcesCount;
+
+    private void OnEnable()
     {
-        StartCoroutine(ScanTimer());
+        _scaner.ResourcesScaned += SortResources;
+    }
+
+    private void OnDisable()
+    {
+        _scaner.ResourcesScaned -= SortResources;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        other.GetComponent<Worker>().GetFree();
-    }
-
-    private void Scan()
-    {
-        Collider[] hits = Physics.OverlapBox(transform.position, _boxParametrs, Quaternion.identity, ResourceMask);
-
-        foreach (Collider hit in hits)
+        if (other.TryGetComponent<Worker>(out Worker worker))
         {
-            Resource resource = hit.GetComponent<Resource>();
-            if(resource.IsFree)
+            if (worker.IsGoHome)
             {
-                foreach (Worker worker in _workers)
-                {
-                    if (worker.IsFree)
-                    {
-                        worker.GetTarget(resource);
-                        resource.GetBusy();
-                        break;
-                    }
-                }
+                worker.BecomeFree();
+                _resourcesCount++;
+                NewResource?.Invoke();
+                _resourcesInProgress.Remove(worker.TargetResource);
             }
         }
     }
 
-    private IEnumerator ScanTimer()
+    private void SortResources(Resource[] resources, int count)
     {
-        var wait = new WaitForSeconds(_scanTimer);
-
-        while (enabled)
+        for (int i = 0; i < count; i++) 
         {
-            Scan();
-            yield return wait;
+            if (_resources.Find(sample => sample == resources[i]) == null && 
+                _resourcesInProgress.Find(sample => sample == resources[i]) == null)
+            {
+                _resources.Add(resources[i]);
+            }
+        }
+
+        SendWorkers();
+    }
+
+    private void SendWorkers()
+    {
+        foreach (Worker worker in _workers)
+        {
+            if (_resources.Count > 0 && worker.IsFree)
+            {
+                worker.GetTarget(_resources[0]);
+                _resourcesInProgress.Add(_resources[0]);
+                _resources.RemoveAt(0);
+            }
         }
     }
 }

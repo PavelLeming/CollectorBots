@@ -8,7 +8,9 @@ public class Worker : MonoBehaviour
     private Resource _targetResorce;
     private float _speed = 5f;
 
+    public Resource TargetResource => _targetResorce;
     public bool IsFree => _isFree;
+    public bool IsGoHome => _isGoHome;
 
     private void Update()
     {
@@ -42,7 +44,7 @@ public class Worker : MonoBehaviour
         _targetResorce = resource;
     }
 
-    public void GetFree()
+    public void BecomeFree()
     {
         _isFree = true;
         _isGoHome = false;
