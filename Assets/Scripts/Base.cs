@@ -60,7 +60,7 @@ public class Base : MonoBehaviour
         {
             if (_resources.Count > 0 && worker.IsFree)
             {
-                worker.GetTarget(_resources[0]);
+                worker.SetTarget(_resources[0]);
                 _resourcesInProgress.Add(_resources[0]);
                 _resources.RemoveAt(0);
             }

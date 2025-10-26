@@ -37,7 +37,7 @@ public class Worker : MonoBehaviour
         }
     }
 
-    public void GetTarget(Resource resource)
+    public void SetTarget(Resource resource)
     {
         _isFree = false;
         _target = resource.transform.position;
