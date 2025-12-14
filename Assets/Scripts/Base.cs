@@ -11,6 +11,7 @@ public class Base : MonoBehaviour
 
     private int _resourcesCount = 0;
     private bool _isClicked = false;
+    private bool _isPrepareToBuild = false;
     private List<Worker> _freeWorkers = new List<Worker>();
 
     public int Resources => _resourcesCount;
@@ -18,7 +19,7 @@ public class Base : MonoBehaviour
 
     private void Update()
     {
-        if (_resourcesCount >= 3)
+        if (_resourcesCount >= 3 && _isPrepareToBuild == false)
         {
             Worker worker = Instantiate(_worker);
             worker.Inicialise(new Vector3(transform.position.x, transform.position.y + 1, transform.position.z), _basePrefab, _bases, this);
@@ -73,9 +74,12 @@ public class Base : MonoBehaviour
 
     private IEnumerator WaitFreeWorker(Vector3 flagPosition)
     {
-        yield return new WaitUntil(() => _freeWorkers.Count != 0);
+        _isPrepareToBuild = true;
+
+        yield return new WaitUntil(() => _freeWorkers.Count != 0 && _resourcesCount >= 5);
 
         _freeWorkers[0].GoBuildBase(flagPosition);
         _workers.Remove(_freeWorkers[0]);
+        _isPrepareToBuild = false;
     }
 }
