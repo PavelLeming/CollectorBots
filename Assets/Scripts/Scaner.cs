@@ -9,6 +9,7 @@ public class Scaner : MonoBehaviour
 
     [SerializeField] private LayerMask ResourceMask;
 
+    private Vector3 _scanerPoint = new Vector3(0, 0, 0);
     private Vector3 _boxParametrs = new Vector3(10f, 1f, 10f);
     private float _scanTimer = 0.5f;
     private Collider[] _hits = new Collider[ResourcesLength];
@@ -23,7 +24,7 @@ public class Scaner : MonoBehaviour
 
     private void Scan()
     {
-        int hitsCount = Physics.OverlapBoxNonAlloc(transform.position, _boxParametrs, _hits, Quaternion.identity, ResourceMask);
+        int hitsCount = Physics.OverlapBoxNonAlloc(_scanerPoint, _boxParametrs, _hits, Quaternion.identity, ResourceMask);
 
         for (int i = 0; i < hitsCount; i++)
         {

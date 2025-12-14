@@ -1,69 +1,87 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 public class Base : MonoBehaviour
 {
+    [SerializeField] private Worker _worker;
     [SerializeField] private List<Worker> _workers;
-    [SerializeField] private Scaner _scaner;
-
-    public event Action NewResource;
+    [SerializeField] private Bases _bases;
+    [SerializeField] private Base _basePrefab;
 
     private int _resourcesCount = 0;
-    private List<Resource> _resources = new List<Resource>();
-    private List<Resource> _resourcesInProgress = new List<Resource>();
+    private bool _isClicked = false;
+    private List<Worker> _freeWorkers = new List<Worker>();
 
     public int Resources => _resourcesCount;
+    public List<Worker> Workers => _workers;
 
-    private void OnEnable()
+    private void Update()
     {
-        _scaner.ResourcesScaned += SortResources;
-    }
-
-    private void OnDisable()
-    {
-        _scaner.ResourcesScaned -= SortResources;
+        if (_resourcesCount >= 3)
+        {
+            Worker worker = Instantiate(_worker);
+            worker.Inicialise(new Vector3(transform.position.x, transform.position.y + 1, transform.position.z), _basePrefab, _bases);
+            _workers.Add(worker);
+            _resourcesCount -= 3;
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.TryGetComponent<Worker>(out Worker worker))
         {
-            if (worker.IsGoHome)
+            if (worker.IsGoHome && _workers.Contains(worker))
             {
                 worker.BecomeFree();
+                _freeWorkers.Add(worker);
                 _resourcesCount++;
-                NewResource?.Invoke();
-                _resourcesInProgress.Remove(worker.TargetResource);
+                _bases.RemoveResourceInProgres(worker.TargetResource);
             }
         }
     }
 
-    private void SortResources(Resource[] resources, int count)
+    public void Inicialise(Vector3 position, List<Worker> workers, Bases bases, Base basePrefab)
     {
-        for (int i = 0; i < count; i++) 
-        {
-            if (_resources.Find(sample => sample == resources[i]) == null && 
-                _resourcesInProgress.Find(sample => sample == resources[i]) == null)
-            {
-                _resources.Add(resources[i]);
-            }
-        }
-
-        SendWorkers();
+        transform.position = position;
+        _workers = workers;
+        _bases = bases;
+        _basePrefab = basePrefab;
     }
 
-    private void SendWorkers()
+    public void BuildBase(Vector3 flagPosition)
     {
-        foreach (Worker worker in _workers)
+        StartCoroutine(WaitFreeWorker(flagPosition));
+    }
+
+    public void SetWorkerBusyStatus(Worker worker)
+    {
+        _freeWorkers.Remove(worker);
+    }
+
+    public void Click()
+    {
+        if (_isClicked)
         {
-            if (_resources.Count > 0 && worker.IsFree)
-            {
-                worker.SetTarget(_resources[0]);
-                _resourcesInProgress.Add(_resources[0]);
-                _resources.RemoveAt(0);
-            }
+            _isClicked = false;
         }
+        else
+        {
+            _isClicked = true;
+        }
+    }
+
+    private IEnumerator WaitFreeWorker(Vector3 flagPosition)
+    {
+        var wait = new WaitForEndOfFrame();
+
+        while (_freeWorkers.Count == 0)
+        {
+        }
+
+        _freeWorkers[0].GoBuildBase(flagPosition);
+        _workers.Remove(_freeWorkers[0]);
+
+        yield return wait;
     }
 }
