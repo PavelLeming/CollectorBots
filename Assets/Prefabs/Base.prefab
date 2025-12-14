@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2244945943352574682}
   - component: {fileID: 4558979460081928810}
   - component: {fileID: 4236333861416850530}
-  - component: {fileID: 3825411858739999747}
+  - component: {fileID: 7634124493699363863}
   m_Layer: 6
   m_Name: Base
   m_TagString: Untagged
@@ -106,7 +106,7 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &3825411858739999747
+--- !u!114 &7634124493699363863
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -121,3 +121,4 @@ MonoBehaviour:
   _worker: {fileID: 5622389008722178113, guid: bb248f41166049d41a8d6f4d66e1ad9d, type: 3}
   _workers: []
   _bases: {fileID: 0}
+  _basePrefab: {fileID: 7634124493699363863}

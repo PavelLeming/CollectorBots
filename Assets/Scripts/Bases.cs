@@ -56,4 +56,9 @@ public class Bases : MonoBehaviour
     {
         _resourcesInProgress.Remove(resource);
     }
+
+    public void AddBase(Base newBase)
+    {
+        _bases.Add(newBase);
+    }
 }

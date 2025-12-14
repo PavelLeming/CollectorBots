@@ -21,7 +21,7 @@ public class Base : MonoBehaviour
         if (_resourcesCount >= 3)
         {
             Worker worker = Instantiate(_worker);
-            worker.Inicialise(new Vector3(transform.position.x, transform.position.y + 1, transform.position.z), _basePrefab, _bases);
+            worker.Inicialise(new Vector3(transform.position.x, transform.position.y + 1, transform.position.z), _basePrefab, _bases, this);
             _workers.Add(worker);
             _resourcesCount -= 3;
         }
@@ -73,15 +73,9 @@ public class Base : MonoBehaviour
 
     private IEnumerator WaitFreeWorker(Vector3 flagPosition)
     {
-        var wait = new WaitForEndOfFrame();
-
-        while (_freeWorkers.Count == 0)
-        {
-        }
+        yield return new WaitUntil(() => _freeWorkers.Count != 0);
 
         _freeWorkers[0].GoBuildBase(flagPosition);
         _workers.Remove(_freeWorkers[0]);
-
-        yield return wait;
     }
 }

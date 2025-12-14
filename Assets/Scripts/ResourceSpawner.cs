@@ -12,7 +12,7 @@ public class ResourceSpawner : MonoBehaviour
     private float _maxX = 9f;
     private float _minZ = -9f;
     private float _maxZ = 9f;
-    private float _spawnTimer = 0.5f;
+    private float _spawnTimer = 1f;
 
     protected ObjectPool<Resource> Objects;
 

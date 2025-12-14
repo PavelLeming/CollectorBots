@@ -3,8 +3,10 @@ using UnityEngine;
 
 public class Worker : MonoBehaviour
 {
-    private Base _basePrefab;
-    private Bases _bases;
+    [SerializeField] private Base _basePrefab;
+    [SerializeField] private Bases _bases;
+    [SerializeField] private Base _motherBase;
+
     private bool _isFree = true;
     private bool _isGoHome = false;
     private bool _isGoBuild = false;
@@ -35,6 +37,9 @@ public class Worker : MonoBehaviour
             {
                 Base newBase = Instantiate(_basePrefab);
                 newBase.Inicialise(_target, new List<Worker>{this}, _bases, _basePrefab);
+                _bases.AddBase(newBase);
+                _isGoBuild = false;
+                _motherBase = newBase;
             }
         }
     }
@@ -45,18 +50,19 @@ public class Worker : MonoBehaviour
         {
             if (resource == _targetResorce)
             {
-                _target = new Vector3(0, 1, 0);
+                _target = _motherBase.transform.position;
                 _isGoHome = true;
                 resource.transform.SetParent(transform);
             }
         }
     }
 
-    public void Inicialise(Vector3 position, Base basePrefab, Bases bases)
+    public void Inicialise(Vector3 position, Base basePrefab, Bases bases, Base motherBase)
     {
         transform.position = position;
         _basePrefab = basePrefab;
         _bases = bases;
+        _motherBase = motherBase;
     }
 
     public void SetTarget(Resource resource)
