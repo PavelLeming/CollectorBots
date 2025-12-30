@@ -3,9 +3,8 @@ using UnityEngine;
 
 public class Worker : MonoBehaviour
 {
-    [SerializeField] private Base _basePrefab;
-    [SerializeField] private Bases _bases;
     [SerializeField] private Base _motherBase;
+    [SerializeField] private BaseSpawner _baseSpawner;
 
     private bool _isFree = true;
     private bool _isGoHome = false;
@@ -35,11 +34,8 @@ public class Worker : MonoBehaviour
 
             if (Mathf.Abs(transform.position.x - _target.x) < 0.01 && Mathf.Abs(transform.position.z - _target.z) < 0.01)
             {
-                Base newBase = Instantiate(_basePrefab);
-                newBase.Inicialise(_target, new List<Worker>{this}, _bases, _basePrefab);
-                _bases.AddBase(newBase);
                 _isGoBuild = false;
-                _motherBase = newBase;
+                _motherBase = _baseSpawner.BuildNewBase(_target, this);
             }
         }
     }
@@ -57,12 +53,11 @@ public class Worker : MonoBehaviour
         }
     }
 
-    public void Inicialise(Vector3 position, Base basePrefab, Bases bases, Base motherBase)
+    public void Inicialise(Vector3 position, Base motherBase, BaseSpawner baseSpawner)
     {
         transform.position = position;
-        _basePrefab = basePrefab;
-        _bases = bases;
         _motherBase = motherBase;
+        _baseSpawner = baseSpawner;
     }
 
     public void SetTarget(Resource resource)

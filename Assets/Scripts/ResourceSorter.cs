@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Bases : MonoBehaviour
+public class ResourceSorter : MonoBehaviour
 {
     [SerializeField] private List<Base> _bases = new List<Base>();
 
@@ -25,8 +25,8 @@ public class Bases : MonoBehaviour
     {
         for (int i = 0; i < count; i++)
         {
-            if (_resources.Find(sample => sample == resources[i]) == null &&
-                _resourcesInProgress.Find(sample => sample == resources[i]) == null)
+            if (_resources.Contains(resources[i]) == false &&
+                _resourcesInProgress.Contains(resources[i]) == false)
             {
                 _resources.Add(resources[i]);
             }
@@ -39,12 +39,10 @@ public class Bases : MonoBehaviour
     {
         foreach (Base oneBase in _bases)
         {
-            foreach (Worker worker in oneBase.Workers)
+            if (_resources.Count > 0)
             {
-                if (_resources.Count > 0 && worker.IsFree)
+                if (oneBase.SendWorker(_resources[0]))
                 {
-                    worker.SetTarget(_resources[0]);
-                    oneBase.SetWorkerBusyStatus(worker);
                     _resourcesInProgress.Add(_resources[0]);
                     _resources.RemoveAt(0);
                 }
